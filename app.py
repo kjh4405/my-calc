@@ -11,7 +11,7 @@ pkgs = {
     "Ultimate": {"price": 2640, "reg_cv": 1080, "bin": 0.08, "self_rate": 0.03, "lim": 6}
 }
 
-# --- 2. 언어 선택 및 텍스트 설정 (최상단 삽입) ---
+# --- 2. 언어 선택 및 텍스트 설정 ---
 st.sidebar.header("🌐 Language Settings")
 lang = st.sidebar.selectbox("Select Language", ["Korean", "English", "Japanese"])
 
@@ -22,7 +22,9 @@ if lang == "Korean":
         "pa_p": "파트너 패키지 등급", "l1": "1대 직접소개 인원", "dup": "하위 복제 인원 (2~6대)",
         "m1": "총 산하 인원", "m2": "초기 비용", "m3": "나의 월 지출", "m4": "총 등록 보너스", "m5": "월 연금 수익", "m6": "종합 순수익",
         "tab1": "📊 보너스 상세내역", "tab2": "💰 ADIL 기대수익", "tab3": "💳 지출/구조 상세",
-        "detail": "보너스 유형별 상세 리포트", "item": "항목", "reg_s": "1회성 등록 수익", "mon_s": "매달 연금 수익"
+        "detail": "보너스 유형별 상세 리포트", "item": "항목", "reg_s": "1회성 등록 수익", "mon_s": "매달 연금 수익",
+        "adil_title": "🪙 ADIL 코인 가치 분석", "listing": "예상 상장가", "prob": "1위 확률",
+        "exp_title": "💳 지출 상세 근거", "init_h": "초기 비용 합계", "mon_h": "월간 실질 지출", "total_h": "종합 지출액"
     }
 elif lang == "English":
     t = {
@@ -31,7 +33,9 @@ elif lang == "English":
         "pa_p": "Partner Package Tier", "l1": "Direct Referrals (1st Gen)", "dup": "Duplication Rate",
         "m1": "Total Org.", "m2": "Initial Cost", "m3": "Monthly Exp.", "m4": "Total Reg. Bonus", "m5": "Recurring Income", "m6": "Net Profit",
         "tab1": "📊 Bonus Details", "tab2": "💰 ADIL Projection", "tab3": "💳 Breakdown",
-        "detail": "Bonus Report", "item": "Item", "reg_s": "One-time Reg.", "mon_s": "Monthly Recurring"
+        "detail": "Bonus Report by Type", "item": "Category", "reg_s": "One-time Registration", "mon_s": "Monthly Recurring",
+        "adil_title": "🪙 ADIL Token Value Analysis", "listing": "Listing Price", "prob": "Win Probability",
+        "exp_title": "💳 Expense Breakdown", "init_h": "Total Initial Cost", "mon_h": "Monthly Practical Expense", "total_h": "Grand Total Expense"
     }
 else: # Japanese
     t = {
@@ -40,19 +44,21 @@ else: # Japanese
         "pa_p": "パートナーの等級", "l1": "1代目の紹介人数", "dup": "複製人数 (2段目以降)",
         "m1": "総組織人数", "m2": "初期費用", "m3": "月間支出", "m4": "登録ボーナス合計", "m5": "月間権利収入", "m6": "総合純利益",
         "tab1": "📊 ボーナス詳細", "tab2": "💰 ADIL期待収益", "tab3": "💳 支出詳細",
-        "detail": "ボーナス詳細レポート", "item": "項目", "reg_s": "登録収入", "mon_s": "月間収入"
+        "detail": "ボーナス詳細レポート", "item": "項目", "reg_s": "登録収入(単발)", "mon_s": "継続月間収入",
+        "adil_title": "🪙 ADILトークン価値分析", "listing": "予想上場価格", "prob": "1位当選確率",
+        "exp_title": "💳 支出詳細根拠", "init_h": "初期費用合計", "mon_h": "月間実質支出", "total_h": "総合支出額"
     }
 
 st.title(t["title"])
 
-# --- 3. 사이드바 입력 (언어 변수 적용) ---
+# --- 3. 사이드바 입력 ---
 my_p = st.sidebar.selectbox(t["my_p"], list(pkgs.keys()), index=2)
 my_gc = st.sidebar.number_input(t["my_gc"], value=120, min_value=120, step=120)
 pa_p = st.sidebar.selectbox(t["pa_p"], list(pkgs.keys()), index=2)
 l1 = st.sidebar.number_input(t["l1"], value=2, min_value=1)
 dup = st.sidebar.radio(t["dup"], [2, 3], index=0)
 
-# --- 4. 계산 로직 (수정 절대 금지 - 검증된 로직) ---
+# --- 4. 계산 로직 (기존 수식 100% 보존) ---
 init_cost = pkgs[my_p]["price"] + 60
 base_game_cost = (my_gc / 120) * 110.25 
 my_gen_cv = my_gc * (20 * pkgs[my_p]["self_rate"])
@@ -80,7 +86,7 @@ for i in range(1, 7):
         t_game_cv += g_cv
         u_reg = r_cv * rates[i]
         u_mon = g_cv * rates[i]
-        stats.append({"단계": f"{i} Gen", "인원": curr, "r_u": u_reg, "m_u": u_mon})
+        stats.append({"Gen": f"{i} Gen", "num": curr, "r_u": u_reg, "m_u": u_mon, "rt": f"{int(rates[i]*100)}%"})
 
 w_reg_cv, w_mon_cv = t_reg_cv / 2, t_game_cv / 2
 bin_reg = w_reg_cv * pkgs[my_p]["bin"]
@@ -92,7 +98,7 @@ total_reg_bonus = sum(s['r_u'] for s in stats) + bin_reg + orb_reg
 total_mon_bonus = sum(s['m_u'] for s in stats) + bin_mon + orb_mon
 net_profit = (total_reg_bonus + total_mon_bonus) - total_expense_sum
 
-# --- 5. 화면 출력 (언어 변수 적용) ---
+# --- 5. 화면 출력 ---
 st.divider()
 m1, m2, m3, m4, m5, m6 = st.columns(6)
 m1.metric(t["m1"], f"{total_people:,}")
@@ -113,4 +119,26 @@ with tabs[0]:
     ]
     st.table(pd.DataFrame(detail_data))
 
-# ... (이하 ADIL 및 상세 정보 탭) ...
+with tabs[1]:
+    st.subheader(f"{t['adil_title']} ({ (my_gc/120)*562.5:,.0f} EA)")
+    adil_prices = [0.1, 0.5, 1.0, 2.0]
+    win_rates = [1/16, 2/16, 4/16]
+    adil_results = []
+    for p in adil_prices:
+        row = {t["listing"]: f"${p}"}
+        for r in win_rates:
+            col_name = f"{t['prob']} {r*100:.1f}%"
+            row[col_name] = f"${((my_gc/120)*562.5 * p * (1+r)):,.1f}"
+        adil_results.append(row)
+    st.table(pd.DataFrame(adil_results))
+
+with tabs[2]:
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.write(f"**[{t['exp_title']}]**")
+        st.write(f"- {t['init_h']}: ${init_cost:,}")
+        st.write(f"- {t['mon_h']}: ${monthly_exp:,.2f}")
+        st.markdown(f"### {t['total_h']}: ${total_expense_sum:,.2f}")
+    with col_b:
+        st.write("**[Organization Structure]**")
+        st.write(pd.DataFrame(stats)[["Gen", "num", "rt"]].rename(columns={"Gen":"Generation", "num":"People", "rt":"Rate"}))
