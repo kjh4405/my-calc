@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 
 st.set_page_config(page_title="DHP 정밀 수익 분석기", layout="wide")
-st.title("🚀 DHP 비지니스 종합 수익 분석 (통합 테이블 수정본)")
+st.title("🚀 DHP 비지니스 종합 수익 분석")
 
-# 1. 데이터 정의 (변함없는 핵심 로직)
+# 1. 데이터 정의
 pkgs = {
     "Basic": {"price": 150, "reg_cv": 72, "bin": 0.05, "self_rate": 0.015, "lim": 2},
     "Standard": {"price": 450, "reg_cv": 216, "bin": 0.06, "self_rate": 0.015, "lim": 3},
@@ -22,9 +22,9 @@ pa_p = st.sidebar.selectbox("파트너 패키지 등급", list(pkgs.keys()), ind
 l1 = st.sidebar.number_input("1대 직접소개 인원", value=2, min_value=1)
 dup = st.sidebar.radio("하위 복제 인원 (2~4대)", [2, 3], index=0)
 
-# --- 계산 로직 (수식 절대 보존) ---
+# --- 계산 로직 ---
 
-# A. 나의 월 지출 ($110.25 고정 로직 반영)
+# A. 나의 월 지출 ($110.25 고정 및 자가 CV 부족분)
 base_game_cost = (my_gc / 120) * 110.25 
 my_gen_cv = my_gc * (20 * pkgs[my_p]["self_rate"])
 cv_shortfall = max(0.0, 72.0 - my_gen_cv)
@@ -38,7 +38,6 @@ p_game_cv_value = 72.0 if pkgs[pa_p]["self_rate"] == 0.03 else 36.0
 
 rates = {1: 0.03, 2: 0.05, 3: 0.08, 4: 0.05}
 lim = pkgs[my_p]["lim"]
-bin_rate = pkgs[my_p]["bin"]
 
 stats = []
 t_reg_cv = t_game_cv = total_people = 0
@@ -54,34 +53,34 @@ for i in range(1, 5):
     t_reg_cv += r_cv
     t_game_cv += g_cv
     
-    # 등급별 수령 가능 여부 확인
     is_qual = i <= lim
     u_reg = r_cv * rates[i] if is_qual else 0
     u_mon = g_cv * rates[i] if is_qual else 0
-    
-    # 바이너리 (소실적 50% 가정 기여도)
-    b_reg = (r_cv / 2) * bin_rate
-    b_mon = (g_cv / 2) * bin_rate
     
     stats.append({
         "단계": f"{i}대" + (" (✅)" if is_qual else " (❌)"),
         "인원": f"{curr:,}명",
         "등록CV": r_cv,
         "등록유니": u_reg,
-        "등록바이너리": b_reg,
         "게임CV": g_cv,
         "연금유니": u_mon,
-        "연금바이너리": b_mon
+        "요율": f"{int(rates[i]*100)}%"
     })
 
-# 오빗 및 총합 계산
-reg_orbit = int((t_reg_cv / 2) // 5460) * 450
-mon_orbit = int((t_game_cv / 2) // 5460) * 450
+# 바이너리 & 오빗 계산 (소실적 CV 근거)
+w_reg_cv = t_reg_cv / 2
+w_mon_cv = t_game_cv / 2
 
-total_reg_bonus = sum(s['등록유니'] + s['등록바이너리'] for s in stats) + reg_orbit
-total_mon_bonus = sum(s['연금유니'] + s['연금바이너리'] for s in stats) + mon_orbit
+bin_reg = w_reg_cv * pkgs[my_p]["bin"]
+bin_mon = w_mon_cv * pkgs[my_p]["bin"]
 
-# ADIL 가치 (120판당 562.5개 고정)
+orb_reg = int(w_reg_cv // 5460) * 450
+orb_mon = int(w_mon_cv // 5460) * 450
+
+total_reg_bonus = sum(s['등록유니'] for s in stats) + bin_reg + orb_reg
+total_mon_bonus = sum(s['연금유니'] for s in stats) + bin_mon + orb_mon
+
+# ADIL 가치
 total_adil = (my_gc / 120) * 562.5
 adil_val = total_adil * 0.4
 
@@ -95,49 +94,59 @@ m4.metric("총 등록 보너스", f"${total_reg_bonus:,.0f}")
 m5.metric("월 연금 수익", f"${total_mon_bonus:,.1f}")
 m6.metric("월 순수익(현금)", f"${total_mon_bonus - total_monthly_exp:,.1f}")
 
-# 통합 테이블 탭 구성
-tabs = st.tabs(["💰 등록 보너스 통합 상세", "📅 연금 보너스 통합 상세", "🎯 ADIL & 자격 요건", "💳 지출 산출 근거"])
+tabs = st.tabs(["💎 유니레벨 보너스", "⚖️ 바이너리 & 오빗 (소실적 기준)", "🎯 ADIL & 자격 요건", "💳 지출 산출 근거"])
 
 with tabs[0]:
-    st.subheader("💰 1회성 등록 보너스 통합 테이블")
-    st.write(f"파트너 {pa_p} 진입 기준 (인당 {p_reg_cv_value} CV 적용)")
+    st.subheader("💎 단계별 유니레벨 보너스")
+    c1, c2 = st.columns(2)
     
-    df_reg = pd.DataFrame(stats)[["단계", "인원", "등록CV", "등록유니", "등록바이너리"]]
-    df_reg.columns = ["단계", "인원수", "발생 CV", "유니레벨($)", "바이너리($)"]
-    st.table(df_reg.style.format({"발생 CV": "{:,.0f}", "유니레벨($)": "{:,.1f}", "바이너리($)": "{:,.1f}"}))
-    
-    st.info(f"**오빗 보너스(등록):** {int((t_reg_cv/2)//5460)}회전 발생 → **${reg_orbit:,.0f}**")
-    st.success(f"**총 등록 보너스 합계 (유니+바이너리+오빗): ${total_reg_bonus:,.1f}**")
+    with c1:
+        st.write("**[1회성 등록 유니레벨]**")
+        df_reg = pd.DataFrame(stats)[["단계", "인원", "등록CV", "요율", "등록유니"]]
+        df_reg.columns = ["단계", "인원수", "발생 CV", "요율", "수익($)"]
+        st.table(df_reg.style.format({"발생 CV": "{:,.0f}", "수익($)": "{:,.1f}"}))
+        st.write(f"**등록 유니레벨 소계: ${sum(s['등록유니'] for s in stats):,.1f}**")
+
+    with c2:
+        st.write("**[월간 연금 유니레벨]**")
+        df_mon = pd.DataFrame(stats)[["단계", "인원", "게임CV", "요율", "연금유니"]]
+        df_mon.columns = ["단계", "인원수", "발생 CV", "요율", "수익($)"]
+        st.table(df_mon.style.format({"발생 CV": "{:,.1f}", "수익($)": "{:,.1f}"}))
+        st.write(f"**연금 유니레벨 소계: ${sum(s['연금유니'] for s in stats):,.1f}**")
 
 with tabs[1]:
-    st.subheader("📅 월간 연금 보너스 통합 테이블")
-    st.write(f"파트너 {pa_p} 월 120판 기준 (인당 {p_game_cv_value} CV 발생)")
+    st.subheader("⚖️ 소실적 CV 기반 보너스 (바이너리 & 오빗)")
+    st.write("바이너리와 오빗은 동일한 **소실적 CV**를 근거로 계산됩니다.")
     
-    df_mon = pd.DataFrame(stats)[["단계", "인원", "게임CV", "연금유니", "연금바이너리"]]
-    df_mon.columns = ["단계", "인원수", "발생 CV", "유니레벨($)", "바이너리($)"]
-    st.table(df_mon.style.format({"발생 CV": "{:,.1f}", "유니레벨($)": "{:,.1f}", "바이너리($)": "{:,.1f}"}))
+    col_reg, col_mon = st.columns(2)
     
-    st.info(f"**오빗 보너스(연금):** {int((t_game_cv/2)//5460)}회전 발생 → **${mon_orbit:,.0f}**")
-    st.success(f"**총 월간 연금 수익 합계 (유니+바이너리+오빗): ${total_mon_bonus:,.1f}**")
+    with col_reg:
+        st.info(f"**등록 소실적 CV: {w_reg_cv:,.0f} CV**")
+        st.write(f"- 바이너리 ({int(pkgs[my_p]['bin']*100)}%): **${bin_reg:,.1f}**")
+        st.write(f"- 오빗 ({int(w_reg_cv//5460)}회전): **${orb_reg:,.0f}**")
+        st.markdown(f"**등록 합계: ${bin_reg + orb_reg:,.1f}**")
+
+    with col_mon:
+        st.success(f"**연금 소실적 CV: {w_mon_cv:,.1f} CV**")
+        st.write(f"- 바이너리 ({int(pkgs[my_p]['bin']*100)}%): **${bin_mon:,.1f}**")
+        st.write(f"- 오빗 ({int(w_mon_cv//5460)}회전): **${orb_mon:,.0f}**")
+        st.markdown(f"**연금 합계: ${bin_mon + orb_mon:,.1f}**")
 
 with tabs[2]:
     st.subheader("🎯 ADIL 및 자격 충족(72 CV)")
     st.write(f"**[ADIL 획득 예상]**")
-    st.write(f"- 월 {my_gc}회 게임 시 예상 ADIL: **{total_adil:,.1f}개**")
-    st.write(f"- 시세 $0.4 기준 가치: **${adil_val:,.1f}**")
+    st.write(f"- 월 {my_gc}회 게임 시 예상 ADIL: **{total_adil:,.1f}개** (가치: **${adil_val:,.1f}**)")
     st.divider()
     st.write(f"**[자가 CV 현황]**")
     st.write(f"- 내 게임으로 발생한 CV: **{my_gen_cv:.1f} CV** (기준: 72.0 CV)")
     if cv_shortfall > 0:
-        st.warning(f"⚠️ 부족분 {cv_shortfall:.1f} CV에 대해 ${shortfall_fee} 추가 구독료가 지출에 합산되었습니다.")
+        st.warning(f"⚠️ 부족분 {cv_shortfall:.1f} CV에 대해 **${shortfall_fee}** 추가 구독료 합산")
     else:
-        st.success("✅ 자가 CV 충족 완료 (추가 구독료 $0)")
+        st.success("✅ 자가 CV 충족 완료")
 
 with tabs[3]:
-    st.subheader("💳 지출 및 이자수익 상세 ($110.25 근거)")
-    st.write("나의 120판 게임 시 발생하는 실질 비용 계산 로직:")
+    st.subheader("💳 지출 산출 근거 ($110.25)")
     st.write("- 1위(7.5회) 비용: $150.00")
     st.write("- 2위(7.5회) 이자수익(4%): -$6.00")
     st.write("- 3~16위(105회) 이자수익(1.5%): -$33.75")
     st.markdown(f"### **실질 게임 지출액: ${base_game_cost:,.2f}**")
-    st.caption("※ 이 지출액에 자가 CV 부족 시 추가 구독료가 더해져 최종 월 지출이 계산됩니다.")
