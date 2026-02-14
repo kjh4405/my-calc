@@ -3,12 +3,14 @@ import streamlit as st
 # 앱 화면 설정
 st.set_page_config(page_title="DHP 비지니스 수익계산기", layout="wide")
 
-st.title("🚀 DHP비지니스 수익계산기 (Ver 2.1)")
-st.write("레벨별 유니레벨 차등 요율 및 4레벨 복제 모델")
+# 제목
+st.title("🚀 DHP비지니스 종합 수익 시뮬레이터")
+st.write("유니레벨, 바이너리, 오빗, 그리고 ADIL 코인 자산까지 한눈에 확인하세요.")
 
-# --- 설정값 입력란 ---
+# --- 설정값 입력란 (사이드바) ---
 st.sidebar.header("📌 설정값 입력")
 
+# 패키지 데이터 정의
 package_info = {
     "Basic": {"cv": 72, "binary": 0.05, "sub": 30, "limit": 2},
     "Standard": {"cv": 216, "binary": 0.06, "sub": 30, "limit": 3},
@@ -17,78 +19,74 @@ package_info = {
 }
 
 # 1. 나의 설정
-my_pkg = st.sidebar.selectbox("나의 패키지 등급", list(package_info.keys()), index=2) # 기본값 Premium
+st.sidebar.subheader("1. 나의 설정")
+my_pkg = st.sidebar.selectbox("나의 패키지 등급", list(package_info.keys()), index=2)
 my_game_type = st.sidebar.selectbox("나의 게임 선택", ["$20 게임", "$40 게임"], index=0)
 my_game_count = st.sidebar.number_input("나의 한 달 게임 횟수", value=120)
 
 # 2. 조직 설정
-partner_pkg = st.sidebar.selectbox("파트너 패키지 등급", list(package_info.keys()), index=2)
-lv1_count = st.sidebar.number_input("나의 직접 소개 (1레벨)", value=2)
-duplication = st.sidebar.radio("하위 복제 인원 (2~4레벨)", [2, 3], index=0)
+st.sidebar.subheader("2. 조직 복제 설정")
+partner_pkg = st.sidebar.selectbox("1레벨 파트너들의 패키지", list(package_info.keys()), index=2)
+lv1_people = st.sidebar.number_input("나의 직접 소개 (1레벨)", value=2, min_value=1)
+duplication = st.sidebar.radio("하위 레벨 복제 인원 (2~4레벨)", [2, 3], index=0)
 
-# --- 계산 로직 ---
+# 3. 코인 및 가격 설정
+st.sidebar.subheader("3. ADIL 코인 설정")
+future_price = st.sidebar.slider("장래 예상 가격 ($)", 0.1, 10.0, 1.0, step=0.1)
 
-# A. 조직 구성 및 유니레벨 계산 (Premium 기준 4레벨까지만)
+# --- 계산 로직 시작 ---
+
+# A. 나의 월 지출
+game_unit_price = 20 if my_game_type == "$20 게임" else 40
+my_monthly_game_cost = my_game_count * game_unit_price
+my_subscription = package_info[my_pkg]["sub"]
+total_my_cost = my_monthly_game_cost + my_subscription
+
+# B. 조직 인원 및 유니레벨 계산 (4레벨)
 p_cv = package_info[partner_pkg]["cv"]
-limit = package_info[my_pkg]["limit"] # 내 등급에 따른 수령 한계 레벨
+limit = package_info[my_pkg]["limit"]
+rates = {1: 0.03, 2: 0.05, 3: 0.08, 4: 0.05}
 
-# 각 레벨별 인원 및 유니레벨 수익 (사용자 제시 요율 적용)
-rates = {1: 0.03, 2: 0.05, 3: 0.08, 4: 0.05, 5: 0.02} # 5단계는 보너스
+lv_stats = {}
+total_unilevel_reg = 0
+total_unilevel_monthly = 0
+current_count = lv1_people
 
-lv_data = {}
-total_unilevel = 0
-current_count = lv1_count
+# 매달 보너스용 게임 CV (120게임 기준)
+game_cv_per_person = 0.6 if my_game_type == "$20 게임" else 1.2
+monthly_game_cv_per_person = 120 * game_cv_per_person
 
-for i in range(1, 5): # 4레벨까지만 계산
+for i in range(1, 5):
     if i > 1:
-        current_count = current_count * duplication
+        current_count *= duplication
     
-    # 내 등급 한계까지만 수익 발생
-    if i <= limit:
-        lv_revenue = (current_count * p_cv) * rates[i]
-    else:
-        lv_revenue = 0
-        
-    lv_data[i] = {"count": current_count, "revenue": lv_revenue}
-    total_unilevel += lv_revenue
+    # 1회성 유니레벨 수익
+    reg_revenue = (current_count * p_cv * rates[i]) if i <= limit else 0
+    # 매달 유니레벨 수익 (동일 방식 적용: 인원 * 월간게임CV * 요율)
+    monthly_revenue = (current_count * monthly_game_cv_per_person * rates[i]) if i <= limit else 0
+    
+    lv_stats[i] = {
+        "count": current_count,
+        "reg_revenue": reg_revenue,
+        "monthly_revenue": monthly_revenue
+    }
+    total_unilevel_reg += reg_revenue
+    total_unilevel_monthly += monthly_revenue
 
-total_people = sum([d["count"] for d in lv_data.values()])
+total_people = sum([d["count"] for d in lv_stats.values()])
 
-# B. 1회성 보너스 (오빗/바이너리)
+# C. 바이너리 & 오빗 계산
+# 1회성
 total_reg_cv_half = (total_people * p_cv) / 2
-orbit_count = total_reg_cv_half // 5460
-income_orbit = orbit_count * 450
-income_binary = total_reg_cv_half * package_info[my_pkg]["binary"]
+orbit_count_reg = total_reg_cv_half // 5460
+income_orbit_reg = orbit_count_reg * 450
+income_binary_reg = total_reg_cv_half * package_info[my_pkg]["binary"]
 
-# C. 나의 월 지출
-cost_game = my_game_count * (20 if my_game_type == "$20 게임" else 40)
-cost_sub = package_info[my_pkg]["sub"]
-total_cost = cost_game + cost_sub
+# 매달
+total_game_cv_half = (total_people * monthly_game_cv_per_person) / 2
+orbit_count_monthly = total_game_cv_half // 5460
+income_orbit_monthly = orbit_count_monthly * 450
+income_binary_monthly = total_game_cv_half * package_info[my_pkg]["binary"]
 
-# --- 화면 출력 ---
-st.divider()
-c1, c2, c3 = st.columns(3)
-c1.metric("총 인원 (4단계)", f"{total_people:,} 명")
-c2.metric("나의 월 지출", f"${total_cost:,}")
-c3.metric("유니레벨 합계", f"${total_unilevel:,.2f}")
-
-st.subheader("📊 상세 수익 구조")
-tab1, tab2, tab3 = st.tabs(["유니레벨 상세", "전체 수익 합계", "나의 유지비용"])
-
-with tab1:
-    st.write(f"**레벨별 유니레벨 수익 분석 ({my_pkg} 등급 기준)**")
-    for i, data in lv_data.items():
-        st.write(f"- {i}레벨 ({rates[i]*100}%): {data['count']}명 × {p_cv}CV = ${data['revenue']:,.2f}")
-    st.info(f"**유니레벨 최종 합계: ${total_unilevel:,.2f}**")
-
-with tab2:
-    st.write("### 💰 1회성 수익 총계")
-    st.write(f"- 오빗 보너스: ${income_orbit:,.0f}")
-    st.write(f"- 바이너리 보너스: ${income_binary:,.2f}")
-    st.write(f"- 유니레벨 보너스: ${total_unilevel:,.2f}")
-    st.success(f"**총합: ${(income_orbit + income_binary + total_unilevel):,.2f}**")
-
-with tab3:
-    st.write(f"- 게임 비용: ${cost_game:,.0f}")
-    st.write(f"- 월 구독료: ${cost_sub:,.0f}")
-    st.error(f"**나의 총 월 지출: ${total_cost:,.0f}**")
+# D. ADIL 코인 가치
+total_adil_monthly = total_
