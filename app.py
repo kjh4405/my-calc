@@ -1,8 +1,7 @@
 import streamlit as st
 
 st.set_page_config(page_title="DHP 수익 시뮬레이터", layout="wide")
-st.title("🚀 DHP 비지니스 수익 상세 분석")
-st.write("등록 보너스와 매달 연금 보너스를 구분하여 정밀 분석합니다.")
+st.title("🚀 DHP 비지니스 수익 정밀 분석기")
 
 # 1. 데이터 정의
 pkgs = {
@@ -24,9 +23,11 @@ l1 = st.sidebar.number_input("1대 직접소개", value=2)
 dup = st.sidebar.radio("하위 복제 인원", [2, 3])
 
 # --- 계산 로직 ---
-g_up = 20 if game_t == "$20" else 40
-g_cv_val = 0.6 if game_t == "$20" else 1.2
-m_g_cv = 120 * g_cv_val 
+# 1인당 발생하는 CV (등록 시 vs 게임 시)
+reg_cv_per_person = pkgs[pa_p]["cv"]
+game_cv_per_play = 0.005 if game_t == "$20" else 0.01 # 1게임당 발생하는 CV (예시값)
+game_cv_per_person_month = 120 * (0.6 if game_t == "$20" else 1.2) # 1인당 월간(120판) 누적 CV
+
 rates = {1: 0.03, 2: 0.05, 3: 0.08, 4: 0.05}
 lim = pkgs[my_p]["lim"]
 
@@ -34,17 +35,15 @@ stats = {}
 t_reg_cv = t_game_cv = t_uni_reg = t_uni_mon = 0
 curr = l1
 
-# 4레벨 복제 및 유니레벨 계산
 for i in range(1, 5):
     if i > 1: curr *= dup
-    r_cv_l = curr * pkgs[pa_p]["cv"]
-    g_cv_l = curr * m_g_cv
+    r_cv_l = curr * reg_cv_per_person
+    g_cv_l = curr * game_cv_per_person_month
     t_reg_cv += r_cv_l
     t_game_cv += g_cv_l
     
     r_rev = (r_cv_l * rates[i]) if i <= lim else 0
     m_rev = (g_cv_l * rates[i]) if i <= lim else 0
-    
     stats[i] = {"cnt": curr, "rcv": r_cv_l, "gcv": g_cv_l, "r_r": r_rev, "m_r": m_rev}
     t_uni_reg += r_rev
     t_uni_mon += m_rev
@@ -63,49 +62,72 @@ st.divider()
 total_people = sum([d["cnt"] for d in stats.values()])
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("총 인원", f"{total_people:,}명")
-c2.metric("나의 월 지출", f"${(my_gc*g_up + pkgs[my_p]['sub']):,.0f}")
+c2.metric("나의 월 지출", f"${(my_gc*(20 if game_t=='$20' else 40) + pkgs[my_p]['sub']):,.0f}")
 c3.metric("총 등록 보너스", f"${(i_bin_reg + i_orbit_reg + t_uni_reg):,.1f}")
 c4.metric("총 월간 보너스", f"${(i_bin_mon + i_orbit_mon + t_uni_mon):,.1f}")
 
-# 메인 분석 탭
-tabs = st.tabs(["💰 1회성 등록 보너스", "📅 매달 연금 보너스", "🎯 ADIL 효율/확률", "💳 지출 상세"])
+tabs = st.tabs(["💰 1회성 등록 보너스", "📅 매달 연금 보너스", "🎯 ADIL 효율 분석", "💳 지출 상세"])
 
 with tabs[0]:
-    st.subheader("초기 패키지 등록 수익 상세")
+    st.subheader("초기 패키지 등록 보너스 상세")
+    st.write(f"**산출 기준:** 파트너 1인당 등록 CV = **{reg_cv_per_person} CV**")
     col1, col2, col3 = st.columns(3)
-    col1.metric("유니레벨(등록)", f"${t_uni_reg:,.1f}")
-    col2.metric("바이너리(등록)", f"${i_bin_reg:,.1f}")
-    col3.metric("오빗(등록)", f"${i_orbit_reg:,.0f}")
+    col1.metric("유니레벨", f"${t_uni_reg:,.1f}")
+    col2.metric("바이너리", f"${i_bin_reg:,.1f}")
+    col3.metric("오빗", f"${i_orbit_reg:,.0f}")
     
-    st.write("---")
-    st.write("**레벨별 유니레벨(등록) 내역**")
-    for i, d in stats.items():
-        st.write(f"- {i}대 ({d['cnt']}명): {d['rcv']:,.0f} CV × {int(rates[i]*100)}% = ${d['r_r']:,.1f}")
+    with st.expander("바이너리/오빗 상세 계산 근거"):
+        st.write(f"- 전체 등록 CV: {t_reg_cv:,.0f} CV")
+        st.write(f"- 소실적(50%) 기준: {w_rcv:,.0f} CV")
+        st.write(f"- 바이너리: {w_rcv:,.0f} CV × {int(pkgs[my_p]['bin']*100)}% = ${i_bin_reg:,.1f}")
+        st.write(f"- 오빗: {w_rcv:,.0f} CV ÷ 5,460 = {int(w_rcv // 5460)}회전 (${i_orbit_reg:,.0f})")
 
 with tabs[1]:
-    st.subheader("월간 게임 활동 연금 수익 상세")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("유니레벨(연금)", f"${t_uni_mon:,.1f}")
-    col2.metric("바이너리(연금)", f"${i_bin_mon:,.1f}")
-    col3.metric("오빗(연금)", f"${i_orbit_mon:,.0f}")
+    st.subheader("월간 게임 활동 보너스 상세")
+    cv_per_play = (0.6 if game_t == "$20" else 1.2) / 120
+    st.write(f"**산출 기준:** 산하 1명이 1게임당 나에게 주는 CV = **{cv_per_play:.4f} CV**")
+    st.write(f"(1인당 월 120판 시 누적 **{0.6 if game_t == '$20' else 1.2} CV** 발생)")
     
-    st.write("---")
-    st.write("**레벨별 유니레벨(연금) 내역**")
-    for i, d in stats.items():
-        st.write(f"- {i}대 ({d['cnt']}명): {d['gcv']:,.0f} CV × {int(rates[i]*100)}% = ${d['m_r']:,.1f}")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("유니레벨", f"${t_uni_mon:,.1f}")
+    col2.metric("바이너리", f"${i_bin_mon:,.1f}")
+    col3.metric("오빗", f"${i_orbit_mon:,.0f}")
+
+    with st.expander("바이너리/오빗 상세 계산 근거"):
+        st.write(f"- 월간 전체 게임 CV: {t_game_cv:,.2f} CV")
+        st.write(f"- 소실적(50%) 기준: {w_gcv:,.2f} CV")
+        st.write(f"- 바이너리: {w_gcv:,.2f} CV × {int(pkgs[my_p]['bin']*100)}% = ${i_bin_mon:,.1f}")
+        st.write(f"- 오빗: {w_gcv:,.2f} CV ÷ 5,460 = {int(w_gcv // 5460)}회전 (${i_orbit_mon:,.0f})")
 
 with tabs[2]:
-    win_p = 0.0625
-    exp_wins = my_gc * win_p
-    at_least_p = (1 - (1 - win_p)**my_gc) * 100
-    total_adil = exp_wins * 100
-    t_price = (my_gc * g_up) / total_adil if total_adil > 0 else 0
+    st.subheader("🎯 ADIL 코인 획득 경제성 (사용자 시나리오)")
+    win_rate = 0.0625 # 6.25%
+    expected_wins = my_gc * win_rate # 120회 시 7.5회
+    adil_per_win = 75 # 회당 75개
+    total_adil_won = expected_wins * adil_per_win # 7.5 * 75 = 562.5개
+    market_val = total_adil_won * 0.4 # 0.4달러 시세 적용
     
-    st.write("### 🎯 ADIL 획득 확률 및 경제성")
-    st.info(f"한 달({my_gc}판) 게임 시 예상 1위 횟수는 **{exp_wins:.2f}회** 이며, 최소 1번 이상 당첨될 확률은 **{at_least_p:.2f}%** 입니다.")
-    st.success(f"나의 코인 평단가: **${t_price:.3f}** (게임비 지출 기준)")
+    my_cost = my_gc * (20 if game_t == "$20" else 40)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info(f"""
+        **획득 시뮬레이션**
+        - 월 게임수: {my_gc}회
+        - 예상 1위 횟수: **{expected_wins:.1f}회** (6.25% 확률)
+        - 1회 당첨 시 획득: **75 ADIL**
+        - **월간 총 획득: {total_adil_won:.1f} ADIL**
+        """)
+    with col2:
+        st.success(f"""
+        **가치 분석 (시세 $0.4 기준)**
+        - 획득 코인 가치: **${market_val:.1f}**
+        - 게임 비용: ${my_cost:,.0f}
+        - **실질 게임 체감비용: ${(my_cost - market_val):,.1f}**
+        """)
+    st.write(f"결과적으로 코인 가치를 제외하면 게임 한 판을 약 **${(my_cost - market_val)/my_gc:.2f}** 에 즐기는 셈입니다.")
 
 with tabs[3]:
     st.write("### 💳 지출 비용 요약")
     st.write(f"**초기 비용:** 패키지 ${pkgs[my_p]['price']} + 알파 $60 = **${pkgs[my_p]['price']+60}**")
-    st.write(f"**월 고정비:** 게임비 ${my_gc*g_up} + 구독료 ${pkgs[my_p]['sub']} = **${my_gc*g_up+pkgs[my_p]['sub']}**")
+    st.write(f"**월 고정비:** 게임비 ${my_gc*(20 if game_t=='$20' else 40)} + 구독료 ${pkgs[my_p]['sub']} = **${my_gc*(20 if game_t=='$20' else 40)+pkgs[my_p]['sub']}**")
