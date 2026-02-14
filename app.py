@@ -5,12 +5,12 @@ st.set_page_config(page_title="DHP 비지니스 수익계산기", layout="wide")
 
 # 제목
 st.title("🚀 DHP비지니스 종합 수익 시뮬레이터")
-st.write("지출 비용 정밀 계산 및 보너스 CV 상세 내역 포함")
+st.write("초기 투자비, 월 지출, 그리고 레벨별 상세 수익 리포트")
 
 # --- 설정값 입력란 (사이드바) ---
 st.sidebar.header("📌 설정값 입력")
 
-# 패키지 데이터 정의 (구매 비용 추가)
+# 패키지 데이터 정의
 package_info = {
     "Basic": {"price": 150, "cv": 72, "binary": 0.05, "sub": 30, "limit": 2},
     "Standard": {"price": 450, "cv": 216, "binary": 0.06, "sub": 30, "limit": 3},
@@ -62,14 +62,12 @@ for i in range(1, 5):
     if i > 1:
         current_count *= duplication
     
-    # 해당 레벨의 총 발생 CV
     level_reg_cv = current_count * p_cv
     level_game_cv = current_count * monthly_game_cv_per_person
     
     total_reg_cv_combined += level_reg_cv
     total_game_cv_combined += level_game_cv
     
-    # 유니레벨 수익
     reg_revenue = (level_reg_cv * rates[i]) if i <= limit else 0
     monthly_revenue = (level_game_cv * rates[i]) if i <= limit else 0
     
@@ -87,10 +85,27 @@ total_people = sum([d["count"] for d in lv_stats.values()])
 
 # 바이너리 & 오빗 상세
 weak_reg_cv = total_reg_cv_combined / 2
-orbit_count_reg = weak_reg_cv // 5460
+orbit_count_reg = int(weak_reg_cv // 5460)
 income_orbit_reg = orbit_count_reg * 450
 income_binary_reg = weak_reg_cv * package_info[my_pkg]["binary"]
 
 weak_game_cv = total_game_cv_combined / 2
-orbit_count_monthly = weak_game_cv // 5460
+orbit_count_monthly = int(weak_game_cv // 5460)
 income_orbit_monthly = orbit_count_monthly * 450
+income_binary_monthly = weak_game_cv * package_info[my_pkg]["binary"]
+
+# ADIL 코인
+total_adil_monthly = total_people * 120 * 10 
+asset_value = total_adil_monthly * future_price
+
+# --- 화면 출력 ---
+
+st.divider()
+dash1, dash2, dash3, dash4 = st.columns(4)
+dash1.metric("4레벨 총 인원", f"{total_people:,}명")
+dash2.metric("나의 총 지출", f"${(my_pkg_price + alpha_stage_cost + my_monthly_game_cost + my_subscription):,.0f}")
+dash3.metric("1회성 보너스", f"${(income_orbit_reg + income_binary_reg + total_unilevel_reg):,.1f}")
+dash4.metric("월 연금 수익", f"${(income_orbit_monthly + income_binary_monthly + total_unilevel_monthly):,.1f}")
+
+st.subheader("🔍 상세 분석 데이터")
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["보너스 CV 내역", "유
