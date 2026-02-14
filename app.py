@@ -108,4 +108,5 @@ dash3.metric("1회성 보너스", f"${(income_orbit_reg + income_binary_reg + to
 dash4.metric("월 연금 수익", f"${(income_orbit_monthly + income_binary_monthly + total_unilevel_monthly):,.1f}")
 
 st.subheader("🔍 상세 분석 데이터")
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["보너스 CV 내역", "유
+# 탭 생성 (오타 방지를 위해 변수 처리)
+tab_
