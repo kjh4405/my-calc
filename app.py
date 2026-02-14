@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 st.set_page_config(page_title="DHP 정밀 수익 분석기", layout="wide")
-st.title("🚀 DHP 비지니스 종합 수익 분석 (최종 완성본)")
+st.title("🚀 DHP 보너스 시뮬레이션")
 
 # [데이터 보존] 기존 가격 및 로직 절대 유지
 pkgs = {
