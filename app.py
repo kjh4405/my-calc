@@ -62,7 +62,7 @@ for i in range(1, 5):
     
     # 1회성 유니레벨 수익
     reg_revenue = (current_count * p_cv * rates[i]) if i <= limit else 0
-    # 매달 유니레벨 수익 (동일 방식 적용: 인원 * 월간게임CV * 요율)
+    # 매달 유니레벨 수익 (동일 방식 적용)
     monthly_revenue = (current_count * monthly_game_cv_per_person * rates[i]) if i <= limit else 0
     
     lv_stats[i] = {
@@ -88,5 +88,56 @@ orbit_count_monthly = total_game_cv_half // 5460
 income_orbit_monthly = orbit_count_monthly * 450
 income_binary_monthly = total_game_cv_half * package_info[my_pkg]["binary"]
 
-# D. ADIL 코인 가치
-total_adil_monthly = total_
+# D. ADIL 코인 가치 (오타 수정됨: total_people)
+total_adil_monthly = total_people * 120 * 10 
+asset_value = total_adil_monthly * future_price
+
+# --- 화면 출력 ---
+
+st.divider()
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("4레벨 총 인원", f"{total_people:,} 명")
+c2.metric("나의 월 지출", f"${total_my_cost:,}")
+c3.metric("1회성 수익 합계", f"${(income_orbit_reg + income_binary_reg + total_unilevel_reg):,.1f}")
+c4.metric("월 연금 수익 합계", f"${(income_orbit_monthly + income_binary_monthly + total_unilevel_monthly):,.1f}")
+
+st.subheader("📝 보너스 상세 내역")
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["유니레벨", "바이너리", "오빗", "ADIL 자산", "나의 지출"])
+
+with tab1:
+    st.write("### 💎 유니레벨 보너스 (1회성 & 매달)")
+    st.write(f"보너스 수령 가능 레벨: {limit}레벨 까지")
+    for i, data in lv_stats.items():
+        st.write(f"**{i}레벨 ({int(rates[i]*100)}%)**: {data['count']}명")
+        st.write(f"- 1회성: ${data['reg_revenue']:,.1f} / 매달: ${data['monthly_revenue']:,.1f}")
+    st.divider()
+    st.write(f"**유니레벨 총합 - 1회성: ${total_unilevel_reg:,.1f} / 매달: ${total_unilevel_monthly:,.1f}**")
+
+with tab2:
+    st.write("### ⚖️ 바이너리 보너스 상세")
+    st.write(f"나의 요율: {package_info[my_pkg]['binary']*100:.0f}%")
+    st.write("**[1회성]**")
+    st.write(f"- 소실적: {total_reg_cv_half:,.0f} CV -> 수익: ${income_binary_reg:,.1f}")
+    st.write("**[매달 연금]**")
+    st.write(f"- 소실적: {total_game_cv_half:,.0f} CV -> 수익: ${income_binary_monthly:,.1f}")
+
+with tab3:
+    st.write("### 🔄 오빗(Orbit) 보너스 상세")
+    st.write("기준: 소실적 5,460 CV당 $450")
+    st.write("**[1회성]**")
+    st.write(f"- {int(orbit_count_reg)}회전 -> 수익: ${income_orbit_reg:,.0f}")
+    st.write("**[매달 연금]**")
+    st.write(f"- {int(orbit_count_monthly)}회전 -> 수익: ${income_orbit_monthly:,.0f}")
+
+with tab4:
+    st.write("### 🪙 ADIL 코인 자산 가치")
+    st.metric("월간 총 획득 코인", f"{total_adil_monthly:,.0f} ADIL")
+    st.info(f"가격이 ${future_price}일 때 가치: **${asset_value:,.0f}**")
+    st.write(f"*(한화 약 {asset_value*1350/100000000:.1f} 억원 / 환율 1,350원 기준)*")
+
+with tab5:
+    st.write("### 💳 나의 월간 유지비용")
+    st.write(f"- 게임 단가: {my_game_type} / 게임 수: {my_game_count}판")
+    st.write(f"- 게임 비용: ${my_monthly_game_cost:,.0f}")
+    st.write(f"- 월 구독료: ${my_subscription:,.0f}")
+    st.error(f"**나의 총 월 지출: ${total_my_cost:,.0f}**")
