@@ -11,7 +11,7 @@ pkgs = {
     "Ultimate": {"price": 2640, "reg_cv": 1080, "bin": 0.08, "self_rate": 0.03, "lim": 6}
 }
 
-# --- 2. 6개 국어 통합 사전 ---
+# --- 2. 6개 국어 통합 사전 (모든 항목 포함) ---
 lang_options = ["Korean", "English", "Japanese", "Chinese", "Thai", "Vietnamese"]
 lang = st.sidebar.selectbox("🌐 Select Language", lang_options)
 
@@ -22,7 +22,8 @@ t_all = {
         "m1": "총 산하 인원", "m2": "총 가입 보너스", "m3": "매월 연금 보너스", "m4": "월 예상 순수익",
         "tab1": "👥 유니레벨 상세", "tab2": "⚖️ 바이너리 상세", "tab3": "🚀 오빗(ORBIT) 상세",
         "recoup_h": "💰 원금 회수(Recoup) 최종 해설", "recoup_now": "🎉 즉시 회수 완료!", "recoup_wait": "예상 원금 회수 시점:",
-        "recoup_desc": "💡 리쿱 이후 발생하는 모든 보너스는 순수익이 됩니다.", "init_cost": "초기 투자금"
+        "recoup_desc": "💡 리쿱 이후 발생하는 모든 보너스는 순수익이 됩니다.", "init_cost": "초기 투자금",
+        "col_gen": "세대", "col_people": "인원", "col_reg": "등록 수당($)", "col_mon": "연금 수당($)"
     },
     "English": {
         "unit": "People", "title": "📊 DHP Business Detail Report", "sidebar_h": "📌 Settings",
@@ -30,15 +31,17 @@ t_all = {
         "m1": "Total Org", "m2": "Total Reg. Bonus", "m3": "Monthly Bonus", "m4": "Net Profit",
         "tab1": "👥 Unilevel", "tab2": "⚖️ Binary", "tab3": "🚀 ORBIT",
         "recoup_h": "💰 Recoup Analysis", "recoup_now": "🎉 Instantly Recouped!", "recoup_wait": "Estimated Recoup Period:",
-        "recoup_desc": "💡 All bonuses after recoup are 100% net profit.", "init_cost": "Initial Investment"
+        "recoup_desc": "💡 All bonuses after recoup are 100% net profit.", "init_cost": "Initial Investment",
+        "col_gen": "Gen", "col_people": "People", "col_reg": "Reg ($)", "col_mon": "Monthly ($)"
     },
     "Japanese": {
         "unit": "人", "title": "📊 DHP 収益詳細レポート", "sidebar_h": "📌 設定",
         "my_p": "自分のパッケージ", "my_gc": "月間プレイ数", "pa_p": "パートナー等級", "l1": "直接紹介 (1代)", "dup": "複製人数 (2-5代)",
         "m1": "総組織人数", "m2": "登録ボーナス合計", "m3": "月間権利収入", "m4": "月間純利益",
-        "tab1": "👥 ユニレベル", "tab2": "⚖️ バイナ리", "tab3": "🚀 ORBIT",
+        "tab1": "👥 ユニレベル", "tab2": "⚖️ バイナリ", "tab3": "🚀 ORBIT",
         "recoup_h": "💰 原価回収(Recoup)解説", "recoup_now": "🎉 即時回収完了！", "recoup_wait": "予想回収時期:",
-        "recoup_desc": "💡 回収後のすべてのボーナスは純利益になります。", "init_cost": "初期投資額"
+        "recoup_desc": "💡 回収後のすべてのボーナスは純利益になります。", "init_cost": "初期投資額",
+        "col_gen": "世代", "col_people": "人数", "col_reg": "登録報酬($)", "col_mon": "月間報酬($)"
     },
     "Chinese": {
         "unit": "人", "title": "📊 DHP 业务收益详细报告", "sidebar_h": "📌 设置",
@@ -46,15 +49,17 @@ t_all = {
         "m1": "总组织人数", "m2": "总注册奖金", "m3": "每月年金收益", "m4": "每月净利润",
         "tab1": "👥 多层次", "tab2": "⚖️ 双轨制", "tab3": "🚀 轨道(ORBIT)",
         "recoup_h": "💰 回本周期分析", "recoup_now": "🎉 即刻回本！", "recoup_wait": "预计回本时间:",
-        "recoup_desc": "💡 回本后的所有奖金均为纯利润。", "init_cost": "初始投资"
+        "recoup_desc": "💡 回本后的所有奖金均为纯利润。", "init_cost": "初始投资",
+        "col_gen": "代", "col_people": "人数", "col_reg": "注册奖金($)", "col_mon": "每月奖金($)"
     },
     "Thai": {
         "unit": "คน", "title": "📊 DHP รายงานรายละเอียดรายได้", "sidebar_h": "📌 การตั้งค่า",
         "my_p": "ระดับของฉัน", "my_gc": "เกมต่อเดือน", "pa_p": "ระดับพาร์ทเนอร์", "l1": "แนะนำตรง (รุ่น 1)", "dup": "การทำซ้ำ (รุ่น 2-5)",
         "m1": "จำนวนคนรวม", "m2": "โบนัสสมัครรวม", "m3": "รายได้รายเดือน", "m4": "กำไรสุทธิ",
-        "tab1": "👥 ยู니เลเวล", "tab2": "⚖️ ไบนารี", "tab3": "🚀 ออร์บิท",
+        "tab1": "👥 ยูนิเลเวล", "tab2": "⚖️ ไบนารี", "tab3": "🚀 ออร์บิท",
         "recoup_h": "💰 วิเคราะห์การคืนทุน", "recoup_now": "🎉 คืนทุนทันที!", "recoup_wait": "ระยะเวลาคืนทุนคาดการณ์:",
-        "recoup_desc": "💡 รายได้หลังจากคืนทุนคือกำไรสุทธิทั้งหมด", "init_cost": "เงินลงทุนเริ่มต้น"
+        "recoup_desc": "💡 รายได้หลังจากคืนทุนคือกำไรสุทธิทั้งหมด", "init_cost": "เงินลงทุนเริ่มต้น",
+        "col_gen": "รุ่น", "col_people": "จำนวนคน", "col_reg": "โบนัสสมัคร($)", "col_mon": "รายได้รายเดือน($)"
     },
     "Vietnamese": {
         "unit": "Người", "title": "📊 Báo cáo chi tiết thu nhập DHP", "sidebar_h": "📌 Cài đặt",
@@ -62,12 +67,13 @@ t_all = {
         "m1": "Tổng thành viên", "m2": "Tổng thưởng ĐK", "m3": "Thu nhập thụ động", "m4": "Lợi nhuận ròng",
         "tab1": "👥 Unilevel", "tab2": "⚖️ Binary", "tab3": "🚀 ORBIT",
         "recoup_h": "💰 Phân tích hồi vốn", "recoup_now": "🎉 Hồi vốn ngay lập tức!", "recoup_wait": "Thời gian hồi vốn dự kiến:",
-        "recoup_desc": "💡 Tất cả thu nhập sau hồi vốn là lợi nhuận ròng.", "init_cost": "Vốn đầu tư ban đầu"
+        "recoup_desc": "💡 Tất cả thu nhập sau hồi vốn là lợi nhuận ròng.", "init_cost": "Vốn đầu tư ban đầu",
+        "col_gen": "Thế hệ", "col_people": "Số người", "col_reg": "Thưởng ĐK($)", "col_mon": "Thưởng tháng($)"
     }
 }
 t = t_all[lang]
 
-# --- 3. 사이드바 입력 및 계산 로직 ---
+# --- 3. 사이드바 및 계산 로직 ---
 st.sidebar.header(t["sidebar_h"])
 my_p = st.sidebar.selectbox(t["my_p"], list(pkgs.keys()), index=2)
 my_gc = st.sidebar.number_input(t["my_gc"], value=120, min_value=120, step=120)
@@ -98,8 +104,10 @@ for i in range(1, 6):
     t_reg_cv += r_cv
     t_game_cv += g_cv
     stats.append({
-        "Gen": f"{i} Gen", "People": int(curr), 
-        "Reg ($)": round(r_cv * rates[i], 1), "Monthly ($)": round(g_cv * rates[i], 1)
+        t["col_gen"]: f"{i} Gen", 
+        t["col_people"]: int(curr), 
+        t["col_reg"]: round(r_cv * rates[i], 1), 
+        t["col_mon"]: round(g_cv * rates[i], 1)
     })
 
 bin_rate = pkgs[my_p]["bin"]
@@ -110,11 +118,11 @@ orb_reg = orb_count_reg * 450
 orb_count_mon = int((t_game_cv / 2) // 5460)
 orb_mon = orb_count_mon * 450
 
-total_reg_bonus = round(sum(s['Reg ($)'] for s in stats) + bin_reg + orb_reg, 1)
-total_mon_bonus = round(sum(s['Monthly ($)'] for s in stats) + bin_mon + orb_mon, 1)
+total_reg_bonus = round(sum(s[t["col_reg"]] for s in stats) + bin_reg + orb_reg, 1)
+total_mon_bonus = round(sum(s[t["col_mon"]] for s in stats) + bin_mon + orb_mon, 1)
 net_monthly_profit = round(total_mon_bonus - monthly_exp, 1)
 
-# --- 4. 리포트 출력 ---
+# --- 4. 메인 리포트 출력 ---
 st.title(t["title"])
 st.divider()
 
@@ -129,13 +137,18 @@ st.divider()
 # --- 5. 상세 탭 섹션 ---
 tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 with tab1:
+    st.subheader(t["tab1"])
     st.table(pd.DataFrame(stats))
+
 with tab2:
+    st.subheader(t["tab2"])
     bin_data = {"Metric": ["Total CV", "Matching CV (50%)", "Bonus ($)"],
                 "Registration": [f"{round(t_reg_cv, 1)}", f"{round(t_reg_cv/2, 1)}", f"${bin_reg}"],
                 "Monthly": [f"{round(t_game_cv, 1)}", f"{round(t_game_cv/2, 1)}", f"${bin_mon}"]}
     st.table(pd.DataFrame(bin_data))
+
 with tab3:
+    st.subheader(t["tab3"])
     orb_data = {"Metric": ["Matching CV", "Cycles", "Bonus ($)"],
                 "Registration": [f"{round(t_reg_cv/2, 1)}", f"{orb_count_reg}x", f"${orb_reg}"],
                 "Monthly": [f"{round(t_game_cv/2, 1)}", f"{orb_count_mon}x", f"${orb_mon}"]}
@@ -149,3 +162,4 @@ else:
     rem = round(init_cost - total_reg_bonus, 1)
     months = round(rem / net_monthly_profit, 1) if net_monthly_profit > 0 else 0
     st.warning(f"{t['recoup_wait']} {months}개월 (남은 원금: ${rem})")
+    st.write(t["recoup_desc"])
