@@ -27,21 +27,21 @@ t_all = {
     },
     "English": {
         "unit": "People", "title": "📊 DHP Business Detail Report", "sidebar_h": "📌 Settings",
-        "my_p": "My Tier", "my_gc": "Monthly Games (120)", "pa_p": "Partner Tier", "l1": "Direct Referrals (1st)", "dup": "Duplication (2nd-5th)",
+        "my_p": "My Tier", "my_gc": "Monthly Games (120)", "pa_p": "Partner Tier", "l1": "Direct Referrals (1st)", "dup": "Duplication (2-5th)",
         "m1": "Total Org", "m2": "Total Reg. Bonus", "m3": "Monthly Bonus", "m4": "Net Profit",
         "tab1": "👥 Unilevel", "tab2": "⚖️ Binary", "tab3": "🚀 ORBIT",
         "recoup_h": "💰 Recoup Analysis", "recoup_now": "🎉 Instantly Recouped!", "recoup_wait": "Estimated Recoup Period:",
         "recoup_desc": "💡 All bonuses after recoup are 100% net profit.", "init_cost": "Initial Investment",
-        "col_gen": "Gen", "col_people": "People", "col_reg": "Reg Bonus ($)", "col_mon": "Monthly Bonus ($)"
+        "col_gen": "Gen", "col_people": "People", "col_reg": "Reg ($)", "col_mon": "Monthly ($)"
     },
     "Japanese": {
         "unit": "人", "title": "📊 DHP 収益詳細レポート", "sidebar_h": "📌 設定",
         "my_p": "自分のパッケージ", "my_gc": "月間プレイ数", "pa_p": "パートナー等級", "l1": "直接紹介 (1代)", "dup": "複製人数 (2-5代)",
-        "m1": "総組織人数", "m2": "登録ボーナス合計", "m3": "月間権利収入", "m4": "月間純利益",
-        "tab1": "👥 ユニレベル", "tab2": "⚖️ バイナリ", "tab3": "🚀 ORBIT",
-        "recoup_h": "💰 原価回収(Recoup)解説", "recoup_now": "🎉 即時回収完了！", "recoup_wait": "予想回収時期:",
-        "recoup_desc": "💡 回収後のすべてのボーナスは純利益になります。", "init_cost": "初期投資額",
-        "col_gen": "世代", "col_people": "人数", "col_reg": "登録報酬($)", "col_mon": "月間報酬($)"
+        "m1": "총 조직 인원", "m2": "등록 보너스 합계", "m3": "월간 권리 수입", "m4": "월간 순이익",
+        "tab1": "👥 유니레벨", "tab2": "⚖️ 바이너리", "tab3": "🚀 오빗",
+        "recoup_h": "💰 원금 회수 분석", "recoup_now": "🎉 즉시 회수 완료!", "recoup_wait": "예상 회수 시점:",
+        "recoup_desc": "💡 회수 후 모든 보너스는 순이익입니다.", "init_cost": "초기 투자금",
+        "col_gen": "세대", "col_people": "인원", "col_reg": "등록 수당($)", "col_mon": "연금 수당($)"
     },
     "Chinese": {
         "unit": "人", "title": "📊 DHP 业务收益详细报告", "sidebar_h": "📌 设置",
@@ -56,7 +56,7 @@ t_all = {
         "unit": "คน", "title": "📊 DHP รายงานรายละเอียดรายได้", "sidebar_h": "📌 การตั้งค่า",
         "my_p": "ระดับของฉัน", "my_gc": "เกมต่อเดือน", "pa_p": "ระดับพาร์ทเนอร์", "l1": "แนะนำตรง (รุ่น 1)", "dup": "การทำซ้ำ (รุ่น 2-5)",
         "m1": "จำนวนคนรวม", "m2": "โบนัสสมัครรวม", "m3": "รายได้รายเดือน", "m4": "กำไรสุทธิ",
-        "tab1": "👥 ยูนิเลเวล", "tab2": "⚖️ ไบนารี", "tab3": "🚀 ออร์บิท",
+        "tab1": "👥 ยู니เลเวล", "tab2": "⚖️ ไบนารี", "tab3": "🚀 ออร์บิท",
         "recoup_h": "💰 วิเคราะห์การคืนทุน", "recoup_now": "🎉 คืนทุนทันที!", "recoup_wait": "ระยะเวลาคืนทุนคาดการณ์:",
         "recoup_desc": "💡 รายได้หลังจากคืนทุนคือกำไรสุทธิทั้งหมด", "init_cost": "เงินลงทุนเริ่มต้น",
         "col_gen": "รุ่น", "col_people": "จำนวนคน", "col_reg": "โบนัสสมัคร($)", "col_mon": "รายได้รายเดือน($)"
@@ -104,27 +104,34 @@ for i in range(1, 6):
     t_reg_cv += r_cv
     t_game_cv += g_cv
     
-    # [핵심 수정] 유니레벨 상세 데이터 소수점 1자리로 강제 고정
+    # [소수점 강제 고정 핵심 포인트] f"{값:.1f}"를 사용하여 문자열로 저장
+    reg_val = r_cv * rates[i]
+    mon_val = g_cv * rates[i]
+    
     stats.append({
         t["col_gen"]: f"{i} Gen", 
-        t["col_people"]: int(curr), 
-        t["col_reg"]: round(float(r_cv * rates[i]), 1), 
-        t["col_mon"]: round(float(g_cv * rates[i]), 1)
+        t["col_people"]: f"{int(curr)}", 
+        t["col_reg"]: f"{reg_val:.1f}", 
+        t["col_mon"]: f"{mon_val:.1f}"
     })
 
 bin_rate = pkgs[my_p]["bin"]
-bin_reg = round((t_reg_cv / 2) * bin_rate, 1)
-bin_mon = round((t_game_cv / 2) * bin_rate, 1)
+bin_reg = (t_reg_cv / 2) * bin_rate
+bin_mon = (t_game_cv / 2) * bin_rate
 orb_count_reg = int((t_reg_cv / 2) // 5460)
 orb_reg = orb_count_reg * 450
 orb_count_mon = int((t_game_cv / 2) // 5460)
 orb_mon = orb_count_mon * 450
 
-total_reg_bonus = round(sum(s[t["col_reg"]] for s in stats) + bin_reg + orb_reg, 1)
-total_mon_bonus = round(sum(s[t["col_mon"]] for s in stats) + bin_mon + orb_mon, 1)
-net_monthly_profit = round(total_mon_bonus - monthly_exp, 1)
+# 합계 계산 (문자열 리스트에서 다시 숫자로 변환하여 합산)
+sum_reg_uni = sum([float(s[t["col_reg"]]) for s in stats])
+sum_mon_uni = sum([float(s[t["col_mon"]]) for s in stats])
 
-# --- 4. 리포트 출력 ---
+total_reg_bonus = sum_reg_uni + bin_reg + orb_reg
+total_mon_bonus = sum_mon_uni + bin_mon + orb_mon
+net_monthly_profit = total_mon_bonus - monthly_exp
+
+# --- 4. 메인 리포트 출력 ---
 st.title(t["title"])
 st.divider()
 
@@ -140,22 +147,21 @@ st.divider()
 tab1, tab2, tab3 = st.tabs([t["tab1"], t["tab2"], t["tab3"]])
 with tab1:
     st.subheader(t["tab1"])
-    # Pandas 데이터프레임으로 변환하여 표 출력
-    df_stats = pd.DataFrame(stats)
-    st.table(df_stats)
+    # 이제 stats 안의 숫자들이 f"{:.1f}"로 이미 고정되어 있어 표에서 늘어나지 않습니다.
+    st.table(pd.DataFrame(stats))
 
 with tab2:
     st.subheader(t["tab2"])
     bin_data = {"Metric": ["Total CV", "Matching CV (50%)", "Bonus ($)"],
-                "Registration": [f"{round(t_reg_cv, 1)}", f"{round(t_reg_cv/2, 1)}", f"${bin_reg:,.1f}"],
-                "Monthly": [f"{round(t_game_cv, 1)}", f"{round(t_game_cv/2, 1)}", f"${bin_mon:,.1f}"]}
+                "Registration": [f"{t_reg_cv:,.1f}", f"{t_reg_cv/2:,.1f}", f"${bin_reg:,.1f}"],
+                "Monthly": [f"{t_game_cv:,.1f}", f"{t_game_cv/2:,.1f}", f"${bin_mon:,.1f}"]}
     st.table(pd.DataFrame(bin_data))
 
 with tab3:
     st.subheader(t["tab3"])
     orb_data = {"Metric": ["Matching CV", "Cycles", "Bonus ($)"],
-                "Registration": [f"{round(t_reg_cv/2, 1)}", f"{orb_count_reg}x", f"${orb_reg:,.1f}"],
-                "Monthly": [f"{round(t_game_cv/2, 1)}", f"{orb_count_mon}x", f"${orb_mon:,.1f}"]}
+                "Registration": [f"{t_reg_cv/2:,.1f}", f"{orb_count_reg}x", f"${orb_reg:,.1f}"],
+                "Monthly": [f"{t_game_cv/2:,.1f}", f"{orb_count_mon}x", f"${orb_mon:,.1f}"]}
     st.table(pd.DataFrame(orb_data))
 
 st.divider()
@@ -163,6 +169,6 @@ st.subheader(t["recoup_h"])
 if total_reg_bonus >= init_cost:
     st.success(f"{t['recoup_now']} (${total_reg_bonus:,.1f})")
 else:
-    rem = round(init_cost - total_reg_bonus, 1)
-    months = round(rem / net_monthly_profit, 1) if net_monthly_profit > 0 else 0
-    st.warning(f"{t['recoup_wait']} {months}개월 (남은 원금: ${rem:,.1f})")
+    rem = init_cost - total_reg_bonus
+    months = rem / net_monthly_profit if net_monthly_profit > 0 else 0
+    st.warning(f"{t['recoup_wait']} {months:.1f}개월 (남은 금액: ${rem:,.1f})")
