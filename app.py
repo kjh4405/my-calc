@@ -11,7 +11,7 @@ pkgs = {
     "Ultimate": {"price": 2640, "reg_cv": 1080, "bin": 0.08, "self_rate": 0.03}
 }
 
-# --- 2. 6개 국어 사전 (일본어 고정 및 타 언어 에러 보정) ---
+# --- 2. 6개 국어 사전 (일본어 완벽 고정 및 한국어 제거) ---
 lang_options = ["Korean", "English", "Japanese", "Chinese", "Thai", "Vietnamese"]
 lang = st.sidebar.selectbox("🌐 Select Language", lang_options)
 
@@ -83,7 +83,7 @@ t_all = {
     },
     "Chinese": {
         "unit": " 游戏", "title": "📊 DHP & ADIL 综合资产分析", "sidebar_h": "📌 设置", "my_p": "我的等级", "my_gc": "每月游戏次数", "pa_p": "伙伴等级", "l1": "直接推荐", "dup": "复制", "m1": "总组织", "m2": "总注册奖", "m3": "总月度奖", "m4": "每月 ADIL", "tab1": "👥 多层次", "tab2": "双轨制", "tab3": "🚀 轨道", "tab4": "🪙 ADIL 估值", "tab5": "💸 现金流", "exp_init": "初始投资", "exp_month": "每月支出", "net_profit": "每月净利润", 
-        "col_gen": "代", "col_people": "人数", "col_reg": "注册($)", "col_mon": "月度($)", "matching_cv": "Matching CV", "bonus_usd": "奖金($)", "cycle": "循环", "adil_info": "120场游戏中获得7.5场第1名 (价值$30的ADIL / $0.4时为562.5个)", 
+        "col_gen": "代", "col_people": "人数", "col_reg": "注册($)", "col_mon": "月度($)", "matching_cv": "Matching CV", "bonus_usd": "奖금($)", "cycle": "循环", "adil_info": "120场游戏中获得7.5场第1名 (价值$30的ADIL / $0.4时为562.5个)", 
         "ref_title": "ℹ️ 参考费用信息", "ref_init": "🔹 初始注册费用", "ref_month": "🔹 每月维持费明细", "ref_init_sub": "(含套餐 + $60 注册费)", 
         "profit_info": "💡 净利润从每月奖金总额中减去固定支出 ($110.25) 计算。", "msg_extra": "固定支出 + 资格维持费", "msg_waived": "240场游戏免除额外费"
     },
@@ -110,6 +110,7 @@ pa_p = st.sidebar.selectbox(t["pa_p"], list(pkgs.keys()), index=2)
 l1 = st.sidebar.number_input(t["l1"], value=2, min_value=1)
 dup = st.sidebar.radio(t["dup"], [2, 3], index=0)
 
+# 공통 변수 계산
 my_adil = (my_gc / 120) * 562.5
 init_exp = pkgs[my_p]["price"] + 60
 fixed_monthly_exp = (my_gc / 120) * 110.25
@@ -117,6 +118,7 @@ is_low_tier = my_p in ["Basic", "Standard"]
 is_120_game = my_gc < 240
 extra_72 = 72.0 if (is_low_tier and is_120_game) else 0.0
 
+# 수익 계산
 p_reg_cv = pkgs[pa_p]["reg_cv"]; p_mon_cv = 72.0 if pkgs[pa_p]["self_rate"] >= 0.03 else 36.0
 rates = {1: 0.03, 2: 0.05, 3: 0.08, 4: 0.05, 5: 0.02}
 stats = []; total_people = 0; t_reg_cv = 0; t_mon_cv = 0; curr = l1
@@ -127,48 +129,50 @@ for i in range(1, 6):
     t_reg_cv += r_cv; t_mon_cv += m_cv
     stats.append({t["col_gen"]: f"{i} Gen", t["col_people"]: f"{int(curr)}", t["col_reg"]: f"{(r_cv * rates[i]):.1f}", t["col_mon"]: f"{(m_cv * rates[i]):.1f}"})
 
-bin_rate = pkgs[my_p]["bin"]; matching_reg_cv = t_reg_cv / 2; matching_mon_cv = t_mon_cv / 2
-bin_reg_bonus = matching_reg_cv * bin_rate; bin_mon_bonus = matching_mon_cv * bin_rate
-orb_cycle_reg = int(matching_reg_cv // 5460); orb_reg_bonus = orb_cycle_reg * 450
-orb_cycle_mon = int(matching_mon_cv // 5460); orb_mon_bonus = orb_cycle_mon * 450
-total_mon_bonus = sum([float(s[t["col_mon"]]) for s in stats]) + bin_mon_bonus + orb_mon_bonus
+bin_rate = pkgs[my_p]["bin"]; m_reg_cv = t_reg_cv / 2; m_mon_cv = t_mon_cv / 2
+bin_reg_bonus = m_reg_cv * bin_rate; bin_mon_bonus = m_mon_cv * bin_rate
+orb_c_reg = int(m_reg_cv // 5460); orb_r_bonus = orb_c_reg * 450
+orb_c_mon = int(m_mon_cv // 5460); orb_m_bonus = orb_c_mon * 450
+total_mon_bonus = sum([float(s[t["col_mon"]]) for s in stats]) + bin_mon_bonus + orb_m_bonus
 net_profit = total_mon_bonus - fixed_monthly_exp
 
 # --- 4. 화면 출력 ---
 st.title(t["title"])
 
 with st.expander(t["ref_title"]):
-    col_info1, col_info2 = st.columns(2)
-    with col_info1:
+    c_i1, c_i2 = st.columns(2)
+    with c_i1:
         st.write(f"**{t['ref_init']}:** `${init_exp:,.2f}`")
         st.caption(t["ref_init_sub"])
-    with col_info2:
+    with c_i2:
         if extra_72 > 0:
             st.write(f"**{t['ref_month']}:** `${fixed_monthly_exp:,.2f} + $72.0` ⚠️")
             st.info(f"💡 {my_p} ({my_gc}{t['unit']}): {t['msg_extra']}")
         else:
             st.write(f"**{t['ref_month']}:** `${fixed_monthly_exp:,.2f}` ✅")
-            if is_low_tier and not is_120_game:
-                st.success(f"✨ {my_p} ({my_gc}{t['unit']}): {t['msg_waived']}")
+            if is_low_tier and not is_120_game: st.success(f"✨ {my_p} ({my_gc}{t['unit']}): {t['msg_waived']}")
 
 st.divider()
 
-m1, m2, m3, m4 = st.columns(4)
-m1.metric(t["m1"], f"{total_people} 人") if lang == "Japanese" else m1.metric(t["m1"], f"{total_people} {t['unit']}")
-m2.metric(t["m2"], f"${(sum([float(s[t['col_reg']]) for s in stats]) + bin_reg_bonus + orb_reg_bonus):,.2f}")
-m3.metric(t["m3"], f"${total_mon_bonus:,.2f}")
-m4.metric(t["m4"], f"{my_adil:,.1f} ADIL")
+# 메인 지표 (Metric 오류 방지를 위해 코드 구조 개선)
+m1_col, m2_col, m3_col, m4_col = st.columns(4)
+unit_text = " 人" if lang == "Japanese" else f" {t['unit']}"
+m1_col.metric(t["m1"], f"{total_people}{unit_text}")
+m2_col.metric(t["m2"], f"${(sum([float(s[t['col_reg']]) for s in stats]) + bin_reg_bonus + orb_r_bonus):,.2f}")
+m3_col.metric(t["m3"], f"${total_mon_bonus:,.2f}")
+m4_col.metric(t["m4"], f"{my_adil:,.1f} ADIL")
 
 st.divider()
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"], t["tab5"]])
-with tab1: st.table(pd.DataFrame(stats))
-with tab2: st.table(pd.DataFrame({"Type": ["Registration", "Monthly"], t["matching_cv"]: [f"{matching_reg_cv:,.1f}", f"{matching_mon_cv:,.1f}"], t["bonus_usd"]: [f"${bin_reg_bonus:,.1f}", f"${bin_mon_bonus:,.1f}"]}))
-with tab3: st.table(pd.DataFrame({"Type": ["Registration", "Monthly"], t["cycle"]: [f"{orb_cycle_reg}x", f"{orb_cycle_mon}x"], t["bonus_usd"]: [f"${orb_reg_bonus:,.1f}", f"${orb_mon_bonus:,.1f}"]}))
-with tab4:
+# 탭 구성
+tabs = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"], t["tab5"]])
+with tabs[0]: st.table(pd.DataFrame(stats))
+with tabs[1]: st.table(pd.DataFrame({"Type": ["Registration", "Monthly"], t["matching_cv"]: [f"{m_reg_cv:,.1f}", f"{m_mon_cv:,.1f}"], t["bonus_usd"]: [f"${bin_reg_bonus:,.1f}", f"${bin_mon_bonus:,.1f}"]}))
+with tabs[2]: st.table(pd.DataFrame({"Type": ["Registration", "Monthly"], t["cycle"]: [f"{orb_c_reg}x", f"{orb_c_mon}x"], t["bonus_usd"]: [f"${orb_r_bonus:,.1f}", f"${orb_m_bonus:,.1f}"]}))
+with tabs[3]:
     st.info(f"💡 {t['adil_info']}")
     st.table(pd.DataFrame([{"ADIL Price": f"${p}", "Value": f"${(my_adil*p):,.1f}"} for p in [0.4, 1.0, 2.0, 5.0]]))
-with tab5:
+with tabs[4]:
     st.info(t["profit_info"])
     c1, c2 = st.columns(2)
     with c1:
