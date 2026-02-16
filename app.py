@@ -59,16 +59,21 @@ pa_p = st.sidebar.selectbox(t["pa_p"], list(pkgs.keys()), index=2)
 l1 = st.sidebar.number_input(t["l1"], value=2, min_value=1)
 dup = st.sidebar.radio(t["dup"], [2, 3], index=0)
 
-# ADIL 및 지출 (요청하신 7.5게임당 562.5개 로직 적용)
-mining_games_per_cycle = 7.5 
-adil_per_mining_cycle = 562.5 # 7.5게임당 획득 수량 ($30 / $0.4)
-my_adil = (my_gc / 120) * adil_per_mining_cycle
+# --- 3. 핵심 계산 로직 (ADIL 수치 정정본) ---
 
+# 120게임 사이클 당 7.5회 당첨 확률 적용
+mining_win_count = 7.5 
+# 7.5회 당첨 시 총 획득하는 ADIL 양 (사용자님 기준)
+total_adil_per_cycle = 562.5 
+
+# 월간 ADIL 획득량 계산: (내 게임수 / 120) * 562.5
+my_adil = (my_gc / 120) * total_adil_per_cycle
+
+# 지출 계산 (기존 동일)
 init_exp = pkgs[my_p]["price"] + 60
 base_sub = (my_gc / 120) * 110.25 
 cv_short = max(0.0, 72.0 - (my_gc * 20 * pkgs[my_p]["self_rate"]))
-month_exp = base_sub + (cv_short * 2.0) 
-
+month_exp = base_sub + (cv_short * 2.0)
 # 보너스 계산
 p_reg_cv = pkgs[pa_p]["reg_cv"]
 p_mon_cv = 72.0 if pkgs[pa_p]["self_rate"] >= 0.03 else 36.0
