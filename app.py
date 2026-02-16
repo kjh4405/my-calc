@@ -47,7 +47,7 @@ t_all = {
         "ref_high_tip": "tier satisfies maintenance with 120 games due to high accumulation rate."
     },
     "Japanese": {
-        "unit": "人", "title": "📊 DHP & ADIL 総合資産分析", "sidebar_h": "📌 設定", "my_p": "マイパッケージ", "my_gc": "月間プレイ数", "pa_p": "パートナーパッケージ", "l1": "直接紹介", "dup": "複製人数", "m1": "総組織", "m2": "등록報酬計", "m3": "月間報酬計", "m4": "ADIL獲得量", "tab1": "👥 ユニレベル", "tab2": "⚖️ 바이너리", "tab3": "🚀 オービット", "tab4": "🪙 ADIL評価", "tab5": "💸 支出/収益", "exp_init": "初期投資", "exp_month": "月間維持費", "net_profit": "月間純利益", "col_gen": "レベル", "col_people": "人数", "col_reg": "登録($)", "col_mon": "月間($)", "matching_cv": "Matching CV", "bonus_usd": "報酬($)", "cycle": "サイクル", "adil_info": "120ゲーム中7.5回1位 ($30相当のADIL獲得 / 0.4ドル基準 562.5個)",
+        "unit": "人", "title": "📊 DHP & ADIL 総合資産分析", "sidebar_h": "📌 設定", "my_p": "マイパッケージ", "my_gc": "月間プレイ数", "pa_p": "パートナーパッケージ", "l1": "直接紹介", "dup": "複製人数", "m1": "総組織", "m2": "登録報酬計", "m3": "月間報酬計", "m4": "ADIL獲得量", "tab1": "👥 ユニレベル", "tab2": "⚖️ バイナリー", "tab3": "🚀 オービット", "tab4": "🪙 ADIL評価", "tab5": "💸 支出/収益", "exp_init": "初期投資", "exp_month": "月間維持費", "net_profit": "月間純利益", "col_gen": "レベル", "col_people": "人数", "col_reg": "登録($)", "col_mon": "月間($)", "matching_cv": "Matching CV", "bonus_usd": "報酬($)", "cycle": "サイクル", "adil_info": "120ゲーム中7.5回1位 ($30相当のADIL獲得 / 0.4ドル基準 562.5個)",
         "ref_title": "ℹ️ 参考用費用案内", "ref_init": "🔹 初期登録費用", "ref_month": "🔹 月間予想維持費",
         "ref_init_sub": "(パッケージ価格 + 加入費 $60 含む)", "ref_low_sub": "(購読料 $72 + 72 CV維持のための不足分補充費用含む)",
         "ref_low_tip": "評価は120ゲームプレイと$72の支払いで72 CVを維持する構造です。",
