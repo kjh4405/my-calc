@@ -54,8 +54,11 @@ adil_eff = 2000 if pkgs[my_p]["self_rate"] >= 0.03 else 1000
 my_adil = (my_gc / 120) * adil_eff
 init_exp = pkgs[my_p]["price"] + 60
 base_sub = (my_gc / 120) * 110.25
-cv_short = max(0.0, 72.0 - (my_gc * 20 * pkgs[my_p]["self_rate"]))
-month_exp = base_sub + (cv_short * 2.0)
+
+# 2. [사용자님이 제시한 ADIL 로직 붙여넣기]
+mining_games_per_cycle = 7.5 
+adil_per_mining_game = 266.6  # 120판당 2000개가 되도록 설정된 값
+my_monthly_adil = (my_gc / 120) * mining_games_per_cycle * adil_per_mining_game
 
 # 보너스 계산
 p_reg_cv = pkgs[pa_p]["reg_cv"]
