@@ -11,14 +11,14 @@ pkgs = {
     "Ultimate": {"price": 2640, "reg_cv": 1080, "bin": 0.08, "self_rate": 0.03}
 }
 
-# --- 2. 6개 국어 사전 (일본어 완벽 고정 및 한국어 제거) ---
+# --- 2. 다국어 사전 (일본어 번역 전문성 강화 및 한국어 제거) ---
 lang_options = ["Korean", "English", "Japanese", "Chinese", "Thai", "Vietnamese"]
 lang = st.sidebar.selectbox("🌐 Select Language", lang_options)
 
 t_all = {
     "Korean": {
         "unit": "게임", "title": "📊 DHP 글로벌 수익 및 ADIL 자산 분석", "sidebar_h": "📌 조건 입력",
-        "my_p": "내 패키지 등급", "my_gc": "나의 월 게임수", "pa_p": "파트너 패키지 등급", "l1": "직접 소개", "dup": "복제",
+        "my_p": "내 패키지 등급", "my_gc": "나의 월 게임수", "pa_p": "파트너 패키지 등급", "pa_gc": "파트너 월 게임수", "l1": "직접 소개", "dup": "복제",
         "m1": "총 조직", "m2": "총 가입 보너스", "m3": "월 보너스 합계", "m4": "ADIL 월 획득량",
         "tab1": "👥 유니레벨", "tab2": "⚖️ 바이너리", "tab3": "🚀 오빗(ORBIT)", "tab4": "🪙 ADIL 가치", "tab5": "💸 지출/수익",
         "exp_init": "초기 투자금 (패키지+가입비)", "exp_month": "월 유지비", "net_profit": "월 예상 순수익",
@@ -32,103 +32,105 @@ t_all = {
     },
     "Japanese": {
         "unit": "ゲーム", 
-        "title": "📊 DHP & ADIL 総合資産分析", 
-        "sidebar_h": "📌 設定", 
-        "my_p": "マイパッケージ", 
-        "my_gc": "月間プレイ数", 
-        "pa_p": "パートナーパッケージ", 
-        "l1": "直接紹介", 
-        "dup": "複製人数", 
-        "m1": "総人数", 
-        "m2": "登録報酬計", 
-        "m3": "月間報酬計", 
-        "m4": "ADIL獲得量", 
+        "title": "📊 DHP & ADIL 総合収益分析", 
+        "sidebar_h": "📌 条件設定", 
+        "my_p": "自分のパッケージ等級", 
+        "my_gc": "自分の月間プレイ数", 
+        "pa_p": "パートナーのパッケージ等級", 
+        "pa_gc": "パートナーの月間プレイ数",
+        "l1": "直紹介数", 
+        "dup": "複製数", 
+        "m1": "組織規模", 
+        "m2": "登録報酬合計", 
+        "m3": "月間報酬合計", 
+        "m4": "ADIL月間獲得量", 
         "tab1": "👥 ユニレベル", 
         "tab2": "⚖️ バイナリー", 
         "tab3": "🚀 オービット", 
-        "tab4": "🪙 ADIL評価", 
-        "tab5": "💸 支出/収益", 
-        "exp_init": "初期投資", 
+        "tab4": "🪙 ADIL評価額", 
+        "tab5": "💸 収支分析", 
+        "exp_init": "初期投資額", 
         "exp_month": "月間維持費", 
         "net_profit": "月間純利益", 
-        "col_gen": "レベル", 
+        "col_gen": "世代", 
         "col_people": "人数", 
-        "col_reg": "登録($)", 
-        "col_mon": "月間($)", 
-        "matching_cv": "Matching CV", 
+        "col_reg": "登録報酬($)", 
+        "col_mon": "継続報酬($)", 
+        "matching_cv": "マッチングCV", 
         "bonus_usd": "報酬($)", 
         "cycle": "サイクル", 
-        "adil_info": "120ゲーム中7.5回1位 ($30相当のADIL獲得 / 0.4ドル基準 562.5個)",
-        "ref_title": "ℹ️ 参考用費用案内", 
+        "adil_info": "120ゲーム中、平均7.5回1位獲得時（$30相当のADIL獲得 / $0.4換算で562.5個）",
+        "ref_title": "ℹ️ 費用案内（参考）", 
         "ref_init": "🔹 初期登録費用", 
         "ref_month": "🔹 月間維持費詳細",
-        "ref_init_sub": "(パッケージ価格 + 加入費 $60 含む)",
-        "profit_info": "💡 純利益は、毎月の報酬合計から固定維持費($110.25)を差し引いて計算されます。",
+        "ref_init_sub": "（パッケージ価格 + 入会費 $60 を含む）",
+        "profit_info": "💡 純利益は、毎月の報酬合計から固定維持費（$110.25）を差し引いて算出されます。",
         "msg_extra": "固定維持費 + 資格維持費", 
-        "msg_waived": "240ゲームプレイにより追加費用免除"
+        "msg_waived": "240ゲーム以上のプレイにより追加費用免除"
     },
     "English": {
         "unit": " Games", "title": "📊 DHP & ADIL Total Analysis", "sidebar_h": "📌 Settings",
-        "my_p": "My Tier", "my_gc": "Monthly Games", "pa_p": "Partner Tier", "l1": "Direct", "dup": "Dup",
+        "my_p": "My Tier", "my_gc": "My Games", "pa_p": "Partner Tier", "pa_gc": "Partner Games", "l1": "Directs", "dup": "Dup",
         "m1": "Total Org", "m2": "Total Reg. Bonus", "m3": "Total Monthly", "m4": "Monthly ADIL",
         "tab1": "👥 Unilevel", "tab2": "⚖️ Binary", "tab3": "🚀 ORBIT", "tab4": "🪙 ADIL Value", "tab5": "💸 Cash Flow",
         "exp_init": "Initial Investment", "exp_month": "Monthly Expense", "net_profit": "Net Monthly Profit",
         "col_gen": "Gen", "col_people": "People", "col_reg": "Reg($)", "col_mon": "Monthly($)",
         "matching_cv": "Matching CV", "bonus_usd": "Bonus($)", "cycle": "Cycle",
         "adil_info": "1st place in 7.5 out of 120 games ($30 worth of ADIL / 562.5 ADIL at $0.4)",
-        "ref_title": "ℹ️ Reference Cost Info", "ref_init": "🔹 Initial Registration Cost", "ref_month": "🔹 Monthly Maintenance Detail",
+        "ref_title": "ℹ️ Reference Cost Info", "ref_init": "🔹 Initial Reg. Cost", "ref_month": "🔹 Monthly Detail",
         "ref_init_sub": "(Includes Pkg + $60 fee)",
-        "profit_info": "💡 Net profit is calculated by subtracting the fixed expense ($110.25) from total monthly bonuses.",
+        "profit_info": "💡 Net profit is total monthly bonuses minus fixed expense ($110.25).",
         "msg_extra": "Fixed Expense + Maintenance Fee", "msg_waived": "Extra fee waived with 240 games"
     },
     "Chinese": {
-        "unit": " 游戏", "title": "📊 DHP & ADIL 综合资产分析", "sidebar_h": "📌 设置", "my_p": "我的等级", "my_gc": "每月游戏次数", "pa_p": "伙伴等级", "l1": "直接推荐", "dup": "复制", "m1": "总组织", "m2": "总注册奖", "m3": "总月度奖", "m4": "每月 ADIL", "tab1": "👥 多层次", "tab2": "双轨制", "tab3": "🚀 轨道", "tab4": "🪙 ADIL 估值", "tab5": "💸 现金流", "exp_init": "初始投资", "exp_month": "每月支出", "net_profit": "每月净利润", 
-        "col_gen": "代", "col_people": "人数", "col_reg": "注册($)", "col_mon": "月度($)", "matching_cv": "Matching CV", "bonus_usd": "奖금($)", "cycle": "循环", "adil_info": "120场游戏中获得7.5场第1名 (价值$30的ADIL / $0.4时为562.5个)", 
-        "ref_title": "ℹ️ 参考费用信息", "ref_init": "🔹 初始注册费用", "ref_month": "🔹 每月维持费明细", "ref_init_sub": "(含套餐 + $60 注册费)", 
+        "unit": " 游戏", "title": "📊 DHP & ADIL 综合资产分析", "sidebar_h": "📌 设置", "my_p": "我的等级", "my_gc": "每月游戏次数", "pa_p": "伙伴等级", "pa_gc": "伙伴每月游戏", "l1": "直接推荐", "dup": "复制", "m1": "总组织", "m2": "总注册奖", "m3": "总月度奖", "m4": "每月 ADIL", "tab1": "👥 多层次", "tab2": "双轨制", "tab3": "🚀 轨道", "tab4": "🪙 ADIL 估值", "tab5": "💸 现金流", "exp_init": "初始投资", "exp_month": "每月支出", "net_profit": "每月净利润", 
+        "col_gen": "代", "col_people": "人数", "col_reg": "注册($)", "col_mon": "月度($)", "matching_cv": "Matching CV", "bonus_usd": "奖金($)", "cycle": "循环", "adil_info": "120场游戏中获得7.5场第1名 (价值$30的ADIL / $0.4时为562.5个)", 
+        "ref_title": "ℹ️ 参考费用信息", "ref_init": "🔹 初始注册费用", "ref_month": "🔹 每月维持费明세", "ref_init_sub": "(含套餐 + $60 注册费)", 
         "profit_info": "💡 净利润从每月奖金总额中减去固定支出 ($110.25) 计算。", "msg_extra": "固定支出 + 资格维持费", "msg_waived": "240场游戏免除额外费"
-    },
-    "Thai": {
-        "unit": " เกม", "title": "📊 วิเคราะห์ DHP & ADIL ทั้งหมด", "sidebar_h": "📌 ตั้งค่า", "my_p": "ระดับของฉัน", "my_gc": "เกมต่อเดือน", "pa_p": "ระดับพาร์ทเนอร์", "l1": "แนะนำตรง", "dup": "การทำซ้ำ", "m1": "คนรวม", "m2": "โบนัสสมัคร", "m3": "โบนัสรายเดือน", "m4": "ADIL ต่อเดือน", "tab1": "👥 ยูนิเลเวล", "tab2": "⚖️ ไบนารี", "tab3": "🚀 ออร์บิท", "tab4": "🪙 ประเมิน ADIL", "tab5": "💸 วิเคราะห์จ่าย", "exp_init": "เงินลงทุน", "exp_month": "รายจ่ายเดือน", "net_profit": "กำไรสุทธิ", 
-        "col_gen": "รุ่น", "col_people": "คน", "col_reg": "สมัคร($)", "col_mon": "รายเดือน($)", "matching_cv": "Matching CV", "bonus_usd": "โบนัส($)", "cycle": "รอบ", "adil_info": "ได้ที่ 1 ใน 7.5 จาก 120 เกม (รับ ADIL มูลค่า $30 / 562.5 ADIL ที่ $0.4)", 
-        "ref_title": "ℹ️ ข้อมูลค่าใช้จ่ายอ้างอิง", "ref_init": "🔹 ค่าลงทะเบียนเริ่มต้น", "ref_month": "🔹 รายละเอียดค่าบำรุงรายเดือน", "ref_init_sub": "(รวมแพ็คเกจ + ค่าธรรมเนียม $60)", 
-        "profit_info": "💡 กำไรสุทธิคำนวณโดยนำโบนัสรวมรายเดือนลบด้วยรายจ่ายคงที่ ($110.25)", "msg_extra": "รายจ่ายคงที่ + ค่าบำรุงคุณสมบัติ", "msg_waived": "เล่น 240 เกม ยกเว้นค่าธรรมเนียมเพิ่ม"
-    },
-    "Vietnamese": {
-        "unit": " Trận", "title": "📊 Phân tích DHP & ADIL tổng thể", "sidebar_h": "📌 Cài đặt", "my_p": "Cấp của tôi", "my_gc": "Lượt chơi/tháng", "pa_p": "Cấp đối tác", "l1": "Trực tiếp", "dup": "Sao chép", "m1": "Tổng tổ chức", "m2": "Thưởng ĐK", "m3": "Thưởng tháng", "m4": "ADIL tháng", "tab1": "👥 Unilevel", "tab2": "⚖️ Binary", "tab3": "🚀 ORBIT", "tab4": "🪙 Định giá ADIL", "tab5": "💸 Dòng tiền", "exp_init": "Vốn ban đầu", "exp_month": "Chi phí tháng", "net_profit": "Lợi nhuận ròng", 
-        "col_gen": "Thế hệ", "col_people": "Số người", "col_reg": "Thưởng ĐK", "col_mon": "Thưởng tháng", "matching_cv": "Matching CV", "bonus_usd": "Thưởng($)", "cycle": "Chu kỳ", "adil_info": "Đạt giải nhất 7.5 trong 120 trận (Nhận $30 ADIL / 562.5 ADIL tại $0.4)", 
-        "ref_title": "ℹ️ Thông tin chi phí tham khảo", "ref_init": "🔹 Chi phí đăng ký ban đầu", "ref_month": "🔹 Chi tiết chi phí duy trì hàng tháng", "ref_init_sub": "(Bao gồm gói + phí $60)", 
-        "profit_info": "💡 Lợi nhuận ròng bằng tổng thưởng trừ chi phí cố định ($110.25)", "msg_extra": "Chi phí cố định + Phí duy trì tư cách", "msg_waived": "Chơi 240 trận được miễn phí bổ sung"
     }
 }
 t = t_all.get(lang, t_all["Korean"])
 
-# --- 3. 핵심 계산 로직 ---
+# --- 3. 핵심 계산 로직 (조직 총 게임수 반영) ---
 st.sidebar.header(t["sidebar_h"])
 my_p = st.sidebar.selectbox(t["my_p"], list(pkgs.keys()), index=2)
 my_gc = st.sidebar.number_input(t["my_gc"], value=120, min_value=120, step=120)
+
+# 파트너 월 게임수 조건 추가 (조직 전체 게임수 계산용)
 pa_p = st.sidebar.selectbox(t["pa_p"], list(pkgs.keys()), index=2)
+pa_gc = st.sidebar.number_input(t.get("pa_gc", "Partner Monthly Games"), value=120, min_value=120, step=120)
+
 l1 = st.sidebar.number_input(t["l1"], value=2, min_value=1)
 dup = st.sidebar.radio(t["dup"], [2, 3], index=0)
 
-# 공통 변수 계산
+# 내 ADIL 및 고정 지출
 my_adil = (my_gc / 120) * 562.5
 init_exp = pkgs[my_p]["price"] + 60
 fixed_monthly_exp = (my_gc / 120) * 110.25
-is_low_tier = my_p in ["Basic", "Standard"]
-is_120_game = my_gc < 240
-extra_72 = 72.0 if (is_low_tier and is_120_game) else 0.0
+extra_72 = 72.0 if (my_p in ["Basic", "Standard"] and my_gc < 240) else 0.0
 
-# 수익 계산
-p_reg_cv = pkgs[pa_p]["reg_cv"]; p_mon_cv = 72.0 if pkgs[pa_p]["self_rate"] >= 0.03 else 36.0
+# 조직 수익 계산 (조직 전체 게임수 반영)
+p_reg_cv = pkgs[pa_p]["reg_cv"]
+# 파트너의 월 게임수에 비례하여 발생하는 CV (120게임 기준 72 혹은 36)
+p_mon_cv = (72.0 if pkgs[pa_p]["self_rate"] >= 0.03 else 36.0) * (pa_gc / 120)
+
 rates = {1: 0.03, 2: 0.05, 3: 0.08, 4: 0.05, 5: 0.02}
 stats = []; total_people = 0; t_reg_cv = 0; t_mon_cv = 0; curr = l1
+
 for i in range(1, 6):
     if i > 1: curr *= dup
     total_people += curr
-    r_cv = curr * p_reg_cv; m_cv = curr * (my_gc / 120 * p_mon_cv)
+    r_cv = curr * p_reg_cv
+    m_cv = curr * p_mon_cv
     t_reg_cv += r_cv; t_mon_cv += m_cv
-    stats.append({t["col_gen"]: f"{i} Gen", t["col_people"]: f"{int(curr)}", t["col_reg"]: f"{(r_cv * rates[i]):.1f}", t["col_mon"]: f"{(m_cv * rates[i]):.1f}"})
+    stats.append({
+        t["col_gen"]: f"{i} Gen", 
+        t["col_people"]: f"{int(curr)}", 
+        t["col_reg"]: f"{(r_cv * rates[i]):.1f}", 
+        t["col_mon"]: f"{(m_cv * rates[i]):.1f}"
+    })
 
+# 바이너리/오빗 계산
 bin_rate = pkgs[my_p]["bin"]; m_reg_cv = t_reg_cv / 2; m_mon_cv = t_mon_cv / 2
 bin_reg_bonus = m_reg_cv * bin_rate; bin_mon_bonus = m_mon_cv * bin_rate
 orb_c_reg = int(m_reg_cv // 5460); orb_r_bonus = orb_c_reg * 450
@@ -150,21 +152,23 @@ with st.expander(t["ref_title"]):
             st.info(f"💡 {my_p} ({my_gc}{t['unit']}): {t['msg_extra']}")
         else:
             st.write(f"**{t['ref_month']}:** `${fixed_monthly_exp:,.2f}` ✅")
-            if is_low_tier and not is_120_game: st.success(f"✨ {my_p} ({my_gc}{t['unit']}): {t['msg_waived']}")
+            if (my_p in ["Basic", "Standard"]) and my_gc >= 240:
+                st.success(f"✨ {my_p} ({my_gc}{t['unit']}): {t['msg_waived']}")
 
 st.divider()
 
-# 메인 지표 (Metric 오류 방지를 위해 코드 구조 개선)
+# 메인 지표
 m1_col, m2_col, m3_col, m4_col = st.columns(4)
-unit_text = " 人" if lang == "Japanese" else f" {t['unit']}"
-m1_col.metric(t["m1"], f"{total_people}{unit_text}")
+total_org_games = int(total_people * pa_gc)
+unit_txt = " 人" if lang == "Japanese" else f" {t['unit']}"
+m1_col.metric(t["m1"], f"{total_people}{unit_txt}", f"{total_org_games:,} Total Games")
 m2_col.metric(t["m2"], f"${(sum([float(s[t['col_reg']]) for s in stats]) + bin_reg_bonus + orb_r_bonus):,.2f}")
 m3_col.metric(t["m3"], f"${total_mon_bonus:,.2f}")
 m4_col.metric(t["m4"], f"{my_adil:,.1f} ADIL")
 
 st.divider()
 
-# 탭 구성
+# 탭 UI
 tabs = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"], t["tab5"]])
 with tabs[0]: st.table(pd.DataFrame(stats))
 with tabs[1]: st.table(pd.DataFrame({"Type": ["Registration", "Monthly"], t["matching_cv"]: [f"{m_reg_cv:,.1f}", f"{m_mon_cv:,.1f}"], t["bonus_usd"]: [f"${bin_reg_bonus:,.1f}", f"${bin_mon_bonus:,.1f}"]}))
@@ -182,5 +186,4 @@ with tabs[4]:
             st.caption(f"({my_p} {my_gc}{t['unit']}: {t['msg_extra']})")
         else:
             st.write(f"**🟠 {t['exp_month']}:** `${fixed_monthly_exp:,.2f}`")
-            if is_low_tier and not is_120_game: st.caption(f"({t['msg_waived']})")
     with c2: st.success(f"**💰 {t['net_profit']}: ${net_profit:,.2f}**")
